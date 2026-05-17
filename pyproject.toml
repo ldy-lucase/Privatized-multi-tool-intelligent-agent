@@ -1,0 +1,15 @@
+[project]
+name = "deepagents-app"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "deepagents>=0.6.1",
+    "fastapi>=0.136.1",
+    "httpx>=0.28.1",
+    "langchain-ollama>=1.1.0",
+    "langchain-openai>=1.2.1",
+    "streamlit>=1.57.0",
+    "uvicorn>=0.47.0",
+]

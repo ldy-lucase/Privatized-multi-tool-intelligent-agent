@@ -1,0 +1,51 @@
+============================================================
+  DeepAgents Python Code Statistics Report
+============================================================
+
+OVERVIEW
+----------------------------------------
+  Total .py files:     551
+  Total lines:         244,311
+  Average lines/file:  443
+  Largest file:        /home/yun/deepagents/libs/code/deepagents_code/app.py (8,709 lines)
+  Smallest file:       /home/yun/deepagents/examples/nvidia_deep_agent/src/__init__.py (0 lines)
+
+TOP 10 LARGEST FILES
+----------------------------------------
+   1. libs/code/deepagents_code/app.py                         8,709 lines
+   2. libs/code/tests/unit_tests/test_app.py                   8,292 lines
+   3. libs/code/tests/unit_tests/test_model_config.py          4,341 lines
+   4. libs/deepagents/tests/unit_tests/test_end_to_end.py      3,625 lines
+   5. libs/code/tests/unit_tests/test_thread_selector.py       3,374 lines
+   6. libs/code/tests/unit_tests/test_config.py                3,004 lines
+   7. libs/code/tests/unit_tests/test_chat_input.py            2,869 lines
+   8. libs/deepagents/tests/unit_tests/test_subagents.py       2,754 lines
+   9. libs/code/deepagents_code/model_config.py                2,749 lines
+  10. libs/code/deepagents_code/config.py                      2,567 lines
+
+FILE SIZE DISTRIBUTION
+----------------------------------------
+         0:   36 files (  6.5%) ###
+      1-50:   84 files ( 15.2%) #######
+    51-200:  137 files ( 24.9%) ############
+   201-500:  156 files ( 28.3%) ##############
+  501-1000:   79 files ( 14.3%) #######
+     1000+:   59 files ( 10.7%) #####
+
+BREAKDOWN BY CATEGORY
+----------------------------------------
+  libs             506 files   233,768 lines  (95.7%)
+  examples          38 files     9,252 lines  (3.8%)
+  (root)             7 files     1,291 lines  (0.5%)
+
+BREAKDOWN BY FILE TYPE
+----------------------------------------
+  Tests                 299 files   144,632 lines  (59.2%)
+  Core logic            211 files    95,854 lines  (39.2%)
+  Config/Constants       11 files     3,296 lines  (1.3%)
+  Package init/main      29 files       529 lines  (0.2%)
+  Type stubs              1 files         0 lines  (0.0%)
+
+============================================================
+Report generated at: Sun May 17 12:51:42 CST 2026
+============================================================

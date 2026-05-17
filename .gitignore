@@ -233,3 +233,17 @@ CLAUDE.md
 libs/cli/frontend/node_modules/
 libs/cli/frontend/dist/
 node_modules/
+
+# 运行时产物
+stats.txt
+report.txt
+hello.txt
+count_stats.sh
+run_stats.py
+
+# 运行时产物
+stats.txt
+report.txt
+hello.txt
+count_stats.sh
+run_stats.py

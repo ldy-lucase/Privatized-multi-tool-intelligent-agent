@@ -1,111 +1,122 @@
-<div align="center">
-  <a href="https://docs.langchain.com/oss/python/deepagents/overview#deep-agents-overview">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset=".github/images/logo-dark.svg">
-      <source media="(prefers-color-scheme: light)" srcset=".github/images/logo-light.svg">
-      <img alt="Deep Agents Logo" src=".github/images/logo-dark.svg" width="50%">
-    </picture>
-  </a>
-</div>
+# Deep Agents — 本地智能 Agent 实战
 
-<div align="center">
-  <h3>The batteries-included agent harness.</h3>
-</div>
+基于 LangChain / LangGraph / Deep Agents 构建的本地 AI Agent 应用，
+支持 Ollama 本地模型和阿里云百炼远程 API。
 
-<div align="center">
-  <a href="https://opensource.org/licenses/MIT" target="_blank"><img src="https://img.shields.io/pypi/l/deepagents" alt="PyPI - License"></a>
-  <a href="https://pypistats.org/packages/deepagents" target="_blank"><img src="https://img.shields.io/pepy/dt/deepagents" alt="PyPI - Downloads"></a>
-  <a href="https://pypi.org/project/deepagents/#history" target="_blank"><img src="https://img.shields.io/pypi/v/deepagents?label=%20" alt="Version"></a>
-  <a href="https://x.com/langchain_oss" target="_blank"><img src="https://img.shields.io/twitter/url/https/twitter.com/langchain_oss.svg?style=social&label=Follow%20%40LangChain" alt="Twitter / X"></a>
-</div>
+---
 
-<br>
+## 文件一览
 
-Deep Agents is an open source agent harness — an opinionated agent that runs out of the box. Extend, override, or replace any piece.
+| 文件 | 用途 | 模型 |
+|------|------|------|
+| `local.py` | 本地 Ollama Agent（5 个自定义工具） | `qwen2.5:7b` (Ollama) |
+| `api.py` | FastAPI 后端，把 Agent 封装为 HTTP API + Streamlit 前端 | `qwen2.5:7b` (Ollama) |
+| `orchestrator.py` | 手写 LangGraph：任务拆解 + ReAct + 分支 + 重试 | `qwen2.5:7b` (Ollama) |
+| `deep_agent_orchestrator.py` | `create_deep_agent` 版：任务拆解 + 工具调用 + 有状态 | `qwen3.6-flash` (百炼) |
+| `streamlit_app.py` | Streamlit Web 聊天界面（搭配 api.py 使用） | — |
+| `main.py` | Hello world 入口 | — |
 
-**Principles:**
+---
 
-- **Opinionated** — defaults tuned for long-horizon, multi-step work
-- **Extensible** — override or replace any piece without forking
-- **Model-agnostic** — works with any LLM that supports tool calling: frontier, open-weight, or local
-- **Production-ready** — built on LangGraph (streaming, persistence, checkpointing) with first-class tracing, evaluation, and deployment via LangSmith
+## 快速开始
 
-**Features include:**
-
-- **Sub-agents** — delegate tasks to agents with isolated context windows
-- **Filesystem** — read, write, edit, or search over pluggable local, sandboxed, or remote backends
-- **Context management** — summarize long threads and offload tool outputs to disk
-- **Shell access** — run commands in your sandbox of choice
-- **Persistent memory** — pluggable state and store backends for cross-session recall
-- **Human-in-the-loop** — approve, edit, or reject tool calls before they run
-- **Skills** — reusable behaviors the agent can load on demand
-- **Tools** — bring your own functions or any MCP server
-
-> [!NOTE]
-> Deep Agents is available as a JavaScript/TypeScript library — see [deepagents.js](https://github.com/langchain-ai/deepagentsjs).
-
-## Quickstart
+### 1. 本地模型（Ollama）
 
 ```bash
-uv add deepagents
+# 安装模型
+ollama pull qwen2.5:7b
+
+# 运行 Agent（翻译、计算、代码解释、SQL 生成）
+uv run local.py
 ```
 
-```python
-from deepagents import create_deep_agent
+### 2. HTTP API + Web 界面
 
-agent = create_deep_agent(
-    model="openai:gpt-5.5",
-    tools=[my_custom_tool],
-    system_prompt="You are a research assistant.",
-)
-result = agent.invoke({"messages": "Research LangGraph and write a summary"})
+```bash
+# 启动后端
+uv run uvicorn api:app --host 0.0.0.0 --port 8000
+
+# 另一个终端启动前端
+uv run streamlit run streamlit_app.py
 ```
 
-The agent can plan, read/write files, and manage its own context. Add your own tools, swap models, customize prompts, configure sub-agents, and more. See the [documentation](https://docs.langchain.com/oss/python/deepagents/overview) for full details.
+打开浏览器访问 `http://localhost:8501`
 
-> [!TIP]
-> For developing, debugging, and deploying AI agents and LLM applications, see [LangSmith](https://docs.langchain.com/langsmith/home).
+### 3. 任务编排（手写 LangGraph）
 
-> [!NOTE]
-> **Deep Agents Code** — a pre-built coding agent in your terminal, similar to Claude Code or Cursor, powered by any LLM. Install with `curl -LsSf https://langch.in/dcode | bash`. See the [documentation](https://docs.langchain.com/oss/python/deepagents/code/overview) for the full feature set.
+```bash
+uv run orchestrator.py
+```
 
-## FAQ
+自动拆解复杂任务 → 工具调用 → 结果汇总，支持多轮有状态对话。
 
-### How is this different from LangGraph or LangChain?
+### 4. 远程 API（百炼）
 
-LangGraph is the graph runtime. LangChain's `create_agent` is a minimal agent harness on top of it. Deep Agents is a more opinionated harness on top of `create_agent` — same building blocks, but with filesystem, sub-agents, context management, and skills bundled in. For how the three relate, see the [LangChain ecosystem overview](https://docs.langchain.com/oss/python/concepts/products).
+```bash
+# 设置 API Key
+export DASHSCOPE_API_KEY="sk-xxxx"
 
-### Does this work with open-weight or local models?
-
-Yes. Any model that supports tool calling works — frontier APIs (OpenAI, Anthropic, Google), open-weight models hosted on providers like Baseten or Fireworks, and self-hosted models via Ollama, vLLM, or llama.cpp. Use any [LangChain chat model](https://docs.langchain.com/oss/python/langchain/models).
-
-### Can I use this in production?
-
-Yes! Deep Agents is built on LangGraph, designed for production agent deployments. Pair it with [LangSmith](https://docs.langchain.com/langsmith/home) for tracing, evaluation, and monitoring. See [Going to production](https://docs.langchain.com/oss/python/deepagents/going-to-production) for the full guide.
-
-### When should I use Deep Agents vs. LangChain or LangGraph directly?
-
-All three are layers in the same stack. Use **Deep Agents** when you want the full harness — planning, context management, delegation — out of the box. Use [**LangChain's `create_agent`**](https://docs.langchain.com/oss/python/langchain/agents) when you want a lighter harness without the bundled middleware. Drop to [**LangGraph**](https://docs.langchain.com/oss/python/langgraph/overview) when the agent loop itself isn't the right shape and you need a custom graph.
-
-The layers compose: any LangGraph `CompiledStateGraph` can be passed in as a sub-agent to a Deep Agent, so custom orchestration plugs in alongside the harness's defaults.
+# 或用 create_deep_agent 版
+uv run deep_agent_orchestrator.py
+```
 
 ---
 
-## Resources
+## 架构对比
 
-- [Examples](examples/) — working agents and patterns
-- [Documentation](https://docs.langchain.com/oss/python/deepagents/overview) — conceptual overviews and guides
-- [API reference](https://reference.langchain.com/python/deepagents/) — complete reference for all public classes, functions, and types
-- [Discussions](https://forum.langchain.com/c/oss-product-help-lc-and-lg/deep-agents/18) — community forum for technical questions, ideas, and feedback
-- [Contributing Guide](https://docs.langchain.com/oss/python/contributing/overview) — how to contribute and find good first issues
-- [Code of Conduct](https://github.com/langchain-ai/langchain/?tab=coc-ov-file) — community guidelines and standards
+### `orchestrator.py` — 手写 LangGraph
+
+```
+用户请求 → Orchestrator（拆解任务）
+              ↓
+         Router（条件分支）
+              ↓
+         Worker（ReAct 循环调工具）
+              ↓
+         Router → 还有任务? → 继续 Worker
+              ↓
+         Summarizer（汇总结果）
+```
+
+- 完全可控，每步可插自定义逻辑
+- 适合小模型（精细控制上下文长度）
+- 355 行，零黑盒依赖
+
+### `deep_agent_orchestrator.py` — `create_deep_agent`
+
+```
+用户请求 → create_deep_agent（内置 ReAct 循环）
+              ↓
+         工具调用（自动管理）
+              ↓
+         有状态（MemorySaver）
+```
+
+- 120 行搞定，内置文件系统、命令执行、子代理
+- 适合远程大模型（qwen-max / Claude / GPT）
+- 需要 `LocalShellBackend` 支持本地命令执行
 
 ---
 
-## Acknowledgements
+## 依赖
 
-Inspired by Claude Code: an attempt to identify what makes it general-purpose, and push that further.
+```bash
+uv add langchain-ollama langchain-openai langgraph \
+      deepagents streamlit fastapi uvicorn
+```
 
-## Security
+---
 
-Deep Agents follows a "trust the LLM" model. The agent can do anything its tools allow. Enforce boundaries at the tool/sandbox level, not by expecting the model to self-police. See the [security policy](https://github.com/langchain-ai/deepagents?tab=security-ov-file) for more information.
+## 项目结构
+
+```
+deepagents/
+├── local.py                     # Ollama 本地 Agent
+├── api.py                       # FastAPI 后端
+├── streamlit_app.py             # Streamlit 前端
+├── orchestrator.py               # 手写 LangGraph 编排
+├── deep_agent_orchestrator.py   # create_deep_agent 版编排
+├── main.py                      # Hello world
+├── start.sh / stop.sh           # 启动/停止脚本
+└── stats.txt / report.txt       # 运行输出示例
+```
